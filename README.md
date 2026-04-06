@@ -78,7 +78,7 @@ npm run test:unit
 ```
 
 ## Jenkins (Docker) Pipeline
-A `Jenkinsfile` is included with three stages using a Dockerized Node agent.
+A root-level `Jenkinsfile` is included with three stages using a Dockerized Node agent. The pipeline runs the app from `spanish-word-flip-flash/`.
 - Agent image: `node:22-alpine`
 - Stages:
   1. build: `npm ci` + `npm run build`
@@ -87,6 +87,20 @@ A `Jenkinsfile` is included with three stages using a Dockerized Node agent.
 
 Environment variables for Jenkins:
 - `E2E_BASE_URL=http://localhost:8080`
+
+## Docker Compose
+There is also a root-level `docker-compose.yml` for local startup.
+
+Run from `D:\playwright\playwright-jenkins-docker`:
+```bash
+docker compose up -d
+```
+
+Services:
+- App: http://localhost:8080
+- Jenkins: http://localhost:8081
+
+Jenkins is started with Docker support so the root `Jenkinsfile` can use Docker-based agents.
 
 Note: If you wish to run E2E in Jenkins, add steps to install Playwright browsers and run `npm run test:e2e -- --project=chromium`, then archive `reports-e2e/**` and publish JUnit from `reports-e2e/junit.xml`.
 
