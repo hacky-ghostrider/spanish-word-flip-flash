@@ -50,17 +50,21 @@ pipeline {
           }
           post {
             always {
-              publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                icon: '',
-                keepAll: false,
-                reportDir: 'reports-e2e/integration/html',
-                reportFiles: 'index.html',
-                reportName: 'Playwright HTML Report - Integration',
-                reportTitles: '',
-                useWrapperFileDirectly: true
-              ])
+              archiveArtifacts artifacts: 'reports-e2e/integration/**/*', allowEmptyArchive: true
+              script {
+                if (fileExists('reports-e2e/integration/html/index.html')) {
+                  publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    icon: '',
+                    keepAll: true,
+                    reportDir: 'reports-e2e/integration/html',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright HTML Report - Integration',
+                    reportTitles: ''
+                  ])
+                }
+              }
               junit stdioRetention: 'All', testResults: 'reports-e2e/integration/junit.xml'
             }
           }
@@ -97,17 +101,21 @@ pipeline {
       }
       post {
         always {
-          publishHTML([
-            allowMissing: false,
-            alwaysLinkToLastBuild: true,
-            icon: '',
-            keepAll: false,
-            reportDir: 'reports-e2e/e2e/html',
-            reportFiles: 'index.html',
-            reportName: 'Playwright HTML Report - E2E',
-            reportTitles: '',
-            useWrapperFileDirectly: true
-          ])
+          archiveArtifacts artifacts: 'reports-e2e/e2e/**/*', allowEmptyArchive: true
+          script {
+            if (fileExists('reports-e2e/e2e/html/index.html')) {
+              publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                icon: '',
+                keepAll: true,
+                reportDir: 'reports-e2e/e2e/html',
+                reportFiles: 'index.html',
+                reportName: 'Playwright HTML Report - E2E',
+                reportTitles: ''
+              ])
+            }
+          }
           junit stdioRetention: 'All', testResults: 'reports-e2e/e2e/junit.xml'
         }
       }
