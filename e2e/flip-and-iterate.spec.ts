@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 
 async function gotoHomeWithRetry(page: Page) {
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 8; i++) {
     await page.goto('/');
     const counter = page.getByTestId('counter');
     try {

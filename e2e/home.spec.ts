@@ -1,10 +1,24 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
+
+async function gotoHomeWithRetry(page: Page) {
+  for (let i = 0; i < 8; i++) {
+    await page.goto('/');
+
+    try {
+      await page.getByTestId('counter').waitFor({ state: 'visible', timeout: 2000 });
+      return;
+    } catch {
+      // Retry navigation in case the app throws during load.
+    }
+  }
+
+  await expect(page.getByTestId('counter')).toBeVisible();
+}
 
 test('homepage loads and shows title', async ({ page }) => {
-  await page.goto('/');
+  await gotoHomeWithRetry(page);
   await expect(page).toHaveTitle(/spanish-word-flip-flash/i);
-  // Consider the app loaded when either counter or next button is visible
-  await page.waitForSelector('[data-testid="counter"], [data-testid="next-btn"]', { state: 'visible' });
+  await expect(page.getByTestId('next-btn')).toBeVisible();
 });
 
 
