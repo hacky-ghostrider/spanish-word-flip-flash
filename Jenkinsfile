@@ -20,7 +20,7 @@ pipeline {
     }
 
     stage('test') {
-      parallel{
+      parallel {
         stage('unit tests') {
           agent {
             docker {
@@ -30,24 +30,43 @@ pipeline {
           }
           steps {
             sh 'npm ci'
-            //Unit tests with VItest
             sh 'npx vitest run --reporter=verbose'
           }
         }
+
         stage('integration tests') {
           agent {
             docker {
               image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
               reuseNode true
             }
-      }
-      steps {
-        sh 'npm ci'
-        sh 'npx playwright test'
+          }
+          environment {
+            PLAYWRIGHT_REPORT_DIR = 'reports-e2e/integration'
+          }
+          steps {
+            sh 'npm ci'
+            sh 'npx playwright test'
+          }
+          post {
+            always {
+              publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                icon: '',
+                keepAll: false,
+                reportDir: 'reports-e2e/integration/html',
+                reportFiles: 'index.html',
+                reportName: 'Playwright HTML Report - Integration',
+                reportTitles: '',
+                useWrapperFileDirectory: true
+              ])
+              junit stdioRetention: 'All', testResults: 'reports-e2e/integration/junit.xml'
+            }
+          }
+        }
       }
     }
-  }
-  }
 
     stage('deploy') {
       agent {
@@ -57,40 +76,39 @@ pipeline {
         }
       }
       steps {
-        //Mock deployment which does nothing
         echo 'Mock deployment was successful!'
       }
     }
-    stage('e2e'){
+
+    stage('e2e') {
       agent {
         docker {
           image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
           reuseNode true
         }
       }
-    environment{
-      E2E_BASE_URL = 'https://spanish-cards.netlify.app/'
-    }
-
+      environment {
+        E2E_BASE_URL = 'https://spanish-cards.netlify.app/'
+        PLAYWRIGHT_REPORT_DIR = 'reports-e2e/e2e'
+      }
       steps {
         sh 'npm ci'
         sh 'npx playwright test'
       }
       post {
         always {
-          //Archive Playwright test results and screenshots
-                pubishHTML([
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    icon:'',
-                    keepAll: false,
-                    reportDir: 'reports-e2e/html/',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright HTML Report',
-                    reportTitles: '',
-                    useWrapperFileDirectory: true
-                ])  
-                junit stdioRetention:'All', testResults: 'reports-e2e/junit.xml'
+          publishHTML([
+            allowMissing: false,
+            alwaysLinkToLastBuild: true,
+            icon: '',
+            keepAll: false,
+            reportDir: 'reports-e2e/e2e/html',
+            reportFiles: 'index.html',
+            reportName: 'Playwright HTML Report - E2E',
+            reportTitles: '',
+            useWrapperFileDirectory: true
+          ])
+          junit stdioRetention: 'All', testResults: 'reports-e2e/e2e/junit.xml'
         }
       }
     }

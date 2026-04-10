@@ -4,6 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
 const baseURL = process.env.E2E_BASE_URL || 'http://localhost:8080';
 const slowMo = process.env.SLOW_MO ? Number(process.env.SLOW_MO) : 0;
 const startLocalServer = baseURL === 'http://localhost:8080';
+const reportDir = process.env.PLAYWRIGHT_REPORT_DIR || 'reports-e2e';
 
 export default defineConfig({
   testDir: './e2e',
@@ -13,8 +14,8 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [
     ['list'],
-    ['junit', { outputFile: 'reports-e2e/junit.xml' }],
-    ['html', { outputFolder: 'reports-e2e/html', open: 'never' }],
+    ['junit', { outputFile: `${reportDir}/junit.xml` }],
+    ['html', { outputFolder: `${reportDir}/html`, open: 'never' }],
   ],
   use: {
     baseURL,
