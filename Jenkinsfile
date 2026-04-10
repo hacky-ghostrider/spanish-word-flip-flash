@@ -76,6 +76,23 @@ pipeline {
         sh 'npm ci'
         sh 'npx playwright test'
       }
+      post {
+        always {
+          //Archive Playwright test results and screenshots
+                pubishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: false,
+                    reportDir: 'reports-e2e/html',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright HTML Report',
+                    reportTitles: '',
+                    useWrapperFileDirectory: true
+                ])  
+                junit stdioRetention:'All', testResults: 'reports-e2e/junit.xml'
+                 archiveArtifacts artifacts: 'reports-e2e/screenshots/**/*.*', allowEmptyArchive: true
+        }
+      }
     }
   }
 }
