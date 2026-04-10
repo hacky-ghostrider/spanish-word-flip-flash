@@ -79,18 +79,18 @@ pipeline {
       post {
         always {
           //Archive Playwright test results and screenshots
-                pubishHTML(target: [
+                pubishHTML([
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
+                    icon:'',
                     keepAll: false,
-                    reportDir: 'reports-e2e/html',
+                    reportDir: 'reports-e2e/html/',
                     reportFiles: 'index.html',
                     reportName: 'Playwright HTML Report',
                     reportTitles: '',
                     useWrapperFileDirectory: true
                 ])  
                 junit stdioRetention:'All', testResults: 'reports-e2e/junit.xml'
-                 archiveArtifacts artifacts: 'reports-e2e/screenshots/**/*.*', allowEmptyArchive: true
         }
       }
     }
