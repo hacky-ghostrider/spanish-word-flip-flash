@@ -59,7 +59,7 @@ pipeline {
                 reportFiles: 'index.html',
                 reportName: 'Playwright HTML Report - Integration',
                 reportTitles: '',
-                useWrapperFileDirectory: true
+                useWrapperFileDirectly: true
               ])
               junit stdioRetention: 'All', testResults: 'reports-e2e/integration/junit.xml'
             }
@@ -106,7 +106,7 @@ pipeline {
             reportFiles: 'index.html',
             reportName: 'Playwright HTML Report - E2E',
             reportTitles: '',
-            useWrapperFileDirectory: true
+            useWrapperFileDirectly: true
           ])
           junit stdioRetention: 'All', testResults: 'reports-e2e/e2e/junit.xml'
         }
