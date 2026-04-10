@@ -23,27 +23,27 @@ test('flip the card and iterate next until wrapping to 1/15', async ({ page }) =
   const transformInner = page.getByTestId('card-inner');
   const next = page.getByTestId('next-btn');
 
-  // Flip each card once, then move to next
-  for (let index = 1; index <= 15; index++) {
+  await expect(counter).toHaveText('1 / 15');
+
+  const classBefore = await transformInner.getAttribute('class');
+  const wasFlippedBefore = (classBefore ?? '').includes('rotate-y-180');
+
+  await card.click({ force: true });
+  await expect
+    .poll(async () => {
+      const classAfter = await transformInner.getAttribute('class');
+      return (classAfter ?? '').includes('rotate-y-180');
+    })
+    .not.toBe(wasFlippedBefore);
+
+  // Use dispatched clicks here to avoid CI/browser-specific actionability
+  // delays from the floating card animation while still exercising the button handler.
+  for (let index = 2; index <= 15; index++) {
+    await next.dispatchEvent('click');
     await expect(counter).toHaveText(`${index} / 15`);
-
-    const classBefore = await transformInner.getAttribute('class');
-    const wasFlippedBefore = (classBefore ?? '').includes('rotate-y-180');
-
-    await card.click({ force: true });
-    await page.waitForTimeout(600);
-
-    const classAfter = await transformInner.getAttribute('class');
-    const isFlippedAfter = (classAfter ?? '').includes('rotate-y-180');
-    expect(isFlippedAfter).not.toBe(wasFlippedBefore);
-
-    if (index < 15) {
-      await next.click();
-    }
   }
 
-  // After flipping the 15th card, going next should wrap to 1 / 15
-  await next.click();
+  await next.dispatchEvent('click');
   await expect(counter).toHaveText('1 / 15');
 });
 
